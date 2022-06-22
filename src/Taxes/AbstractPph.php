@@ -75,7 +75,7 @@ abstract class AbstractPph
     {
         $rate = 5;
 
-        if($monthlyNetIncome < 50000000 and $monthlyNetIncome > 250000000) {
+        if($monthlyNetIncome > 50000000 and $monthlyNetIncome < 250000000) {
             $rate = 15;
         } elseif($monthlyNetIncome > 250000000 and $monthlyNetIncome < 500000000) {
             $rate = 25;

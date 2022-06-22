@@ -40,7 +40,7 @@ class State
      *
      * @var int
      */
-    public $highestWage = 8000000;
+    public $highestWage = 12000000;
 
     /**
      * State::$additionalPTKPforMarriedEmployees

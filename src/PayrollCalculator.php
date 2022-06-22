@@ -55,6 +55,38 @@ class PayrollCalculator
     const GROSS_UP_CALCULATION = 'GROSSUP';
 
     /**
+     * PayrollCalculator::PKWTT
+     * Pegawai Tetap
+     * 
+     * @var string
+     */
+    const PKWTT = 'PKWTT';
+
+    /**
+     * PayrollCalculator::PKWT
+     * Pegawai Tidak Tetap
+     * 
+     * @var string
+     */
+    const PKWT = 'PKWT';
+
+    /**
+     * PayrollCalculator::PKHL
+     * Pekerja Harian Lepas
+     * 
+     * @var string
+     */
+    const PKHL = 'PKHL';
+
+    /**
+     * PayrollCalculator::KEMITRAAN
+     * Pegawai kemitraan
+     * 
+     * @var string
+     */
+    const KEMITRAAN = 'KEMITRAAN';
+
+    /**
      * PayrollCalculator::$provisions
      *
      * @var \Steevenz\IndonesiaPayrollCalculator\DataStructures\Provisions
@@ -83,6 +115,27 @@ class PayrollCalculator
     public $method = 'NETTO';
 
     /**
+     * PayrollCalculator::$employeeType
+     *
+     * @var string
+     */
+    public $employeeType = 'PKWTT';
+
+    /**
+     * PayrollCalculator::$berkesinambungan
+     * Untuk pekerja KEMITRAAN
+     * @var string
+     */
+    public $berkesinambungan = 'YA';
+
+    /**
+     * PayrollCalculator::$cutOff
+     * Untuk perhitungan cut off absen
+     * @var string
+     */
+    public $cutOff = 1;
+
+    /**
      * PayrollCalculator::$result
      *
      * @var SplArrayObject
@@ -100,16 +153,20 @@ class PayrollCalculator
     {
         $this->provisions = new DataStructures\Provisions();
         $this->employee = new DataStructures\Employee();
+        $this->company = new DataStructures\Company();
         $this->result = new SplArrayObject([
             'earnings'    => new SplArrayObject([
                 'base'           => 0,
                 'fixedAllowance' => 0,
+                'holidayAllowance' => 0,
                 'annualy'        => new SplArrayObject([
                     'nett'  => 0,
                     'gross' => 0,
                 ]),
             ]),
             'takeHomePay' => 0,
+            'employeeType' => '',
+            'berkesinambungan' => ''
         ]);
     }
 
@@ -149,7 +206,12 @@ class PayrollCalculator
 
         if ($this->employee->calculateHolidayAllowance > 0) {
             $this->result->earnings->holidayAllowance = $this->employee->calculateHolidayAllowance * $this->result->earnings->gross;
+            $this->employee->allowances->holidayAllowance = $this->employee->calculateHolidayAllowance * $this->result->earnings->gross;
         }
+
+        //SET KATEGORI KARYAWAN
+        $this->result->employeeType = $this->employeeType;
+        $this->result->berkesinambungan = $this->berkesinambungan;
 
         // Penghasilan tidak teratur
         if ($this->provisions->company->calculateOvertime === true) {
@@ -252,23 +314,45 @@ class PayrollCalculator
             }
 
             if ($this->provisions->company->JHT === true) {
-                if ($this->result->earnings->gross < $this->provisions->state->highestWage) {
-                    $this->company->allowances->JHT = $this->result->earnings->gross * (3.7 / 100);
-                    $this->employee->deductions->JHT = $this->result->earnings->gross * (2 / 100);
-                } elseif ($this->result->earnings->gross >= $this->provisions->state->provinceMinimumWage && $this->result->earnings->gross >= $this->provisions->state->highestWage) {
-                    $this->company->allowances->JHT = $this->provisions->state->highestWage * (3.7 / 100);
-                    $this->employee->deductions->JHT = $this->provisions->state->highestWage * (2 / 100);
+                if ($this->provisions->company->bpjstk_pay_by_company === true) {
+                    if ($this->result->earnings->gross < $this->provisions->state->highestWage) {
+                        $this->company->allowances->JHT = $this->result->earnings->gross * (5.7 / 100);
+                        $this->employee->deductions->JHT = 0;
+                    } elseif ($this->result->earnings->gross >= $this->provisions->state->provinceMinimumWage && $this->result->earnings->gross >= $this->provisions->state->highestWage) {
+                        $this->company->allowances->JHT = $this->provisions->state->highestWage * (5.7 / 100);
+                        $this->employee->deductions->JHT = 0;
+                    }
+                } else {
+                    if ($this->result->earnings->gross < $this->provisions->state->highestWage) {
+                        $this->company->allowances->JHT = $this->result->earnings->gross * (3.7 / 100);
+                        $this->employee->deductions->JHT = $this->result->earnings->gross * (2 / 100);
+                    } elseif ($this->result->earnings->gross >= $this->provisions->state->provinceMinimumWage && $this->result->earnings->gross >= $this->provisions->state->highestWage) {
+                        $this->company->allowances->JHT = $this->provisions->state->highestWage * (3.7 / 100);
+                        $this->employee->deductions->JHT = $this->provisions->state->highestWage * (2 / 100);
+                    }
                 }
+                
             }
 
             if ($this->provisions->company->JIP === true) {
-                if ($this->result->earnings->gross < $this->provisions->state->highestWage) {
-                    $this->company->allowances->JIP = $this->result->earnings->gross * (2 / 100);
-                    $this->employee->deductions->JIP = $this->result->earnings->gross * (1 / 100);
-                } elseif ($this->result->earnings->gross >= $this->provisions->state->provinceMinimumWage && $this->result->earnings->gross >= $this->provisions->state->highestWage) {
-                    $this->company->allowances->JIP = 7000000 * (2 / 100);
-                    $this->employee->deductions->JIP = 7000000 * (1 / 100);
+                if ($this->provisions->company->bpjstk_pay_by_company === true) {
+                    if ($this->result->earnings->gross < $this->provisions->state->highestWage) {
+                        $this->company->allowances->JIP = $this->result->earnings->gross * (3 / 100);
+                        $this->employee->deductions->JIP = 0;
+                    } elseif ($this->result->earnings->gross >= $this->provisions->state->provinceMinimumWage && $this->result->earnings->gross >= $this->provisions->state->highestWage) {
+                        $this->company->allowances->JIP = 7000000 * (3 / 100);
+                        $this->employee->deductions->JIP = 0;
+                    }
+                } else {
+                    if ($this->result->earnings->gross < $this->provisions->state->highestWage) {
+                        $this->company->allowances->JIP = $this->result->earnings->gross * (2 / 100);
+                        $this->employee->deductions->JIP = $this->result->earnings->gross * (1 / 100);
+                    } elseif ($this->result->earnings->gross >= $this->provisions->state->provinceMinimumWage && $this->result->earnings->gross >= $this->provisions->state->highestWage) {
+                        $this->company->allowances->JIP = 7000000 * (2 / 100);
+                        $this->employee->deductions->JIP = 7000000 * (1 / 100);
+                    }
                 }
+                
             }
 
             $monthlyPositionTax = 0;
@@ -303,6 +387,11 @@ class PayrollCalculator
                 );
             }
 
+            // Tunjangan Hari Raya
+            if ($this->employee->earnings->holidayAllowance > 0) {
+                $this->result->allowances->offsetSet('holiday', $this->employee->earnings->holidayAllowance);
+            }
+
             // Pendapatan bersih
             $this->result->earnings->nett = $this->result->earnings->gross + $this->result->allowances->getSum() - $this->result->deductions->getSum();
             $this->result->earnings->annualy->nett = $this->result->earnings->nett * 12;
@@ -316,18 +405,17 @@ class PayrollCalculator
                 'absent' => $this->employee->presences->absentDays * $this->provisions->company->absentPenalty,
             ]));
 
-            // Tunjangan Hari Raya
-            if ($this->employee->earnings->holidayAllowance > 0) {
-                $this->result->allowances->offsetSet('holiday', $this->employee->earnings->holidayAllowance);
-            }
+            //return $this->result;
 
             switch ($this->method) {
                 // Pajak ditanggung oleh perusahaan
                 case self::NETT_CALCULATION:
                     $this->result->takeHomePay = $this->result->earnings->nett + $this->employee->earnings->holidayAllowance + $this->employee->bonus->getSum() - $this->employee->deductions->penalty->getSum();
-                    $this->result->company->allowances->offsetSet('positionTax', $monthlyPositionTax);
-                    $this->result->company->allowances->offsetSet('pph21Tax',
-                        $this->result->taxable->liability->monthly);
+                    //$this->result->allowances->offsetSet('positionTax', $monthlyPositionTax);
+                    //$this->result->allowances->offsetSet('pph21Tax', $this->result->taxable->liability->monthly);
+                    $this->company->allowances->positionTax = $monthlyPositionTax;
+                    $this->company->allowances->pph21Tax = $this->result->taxable->liability->monthly;
+                    //$this->company->deductions->BPJSKesehatan
                     break;
                 // Pajak ditanggung oleh karyawan
                 case self::GROSS_CALCULATION:
