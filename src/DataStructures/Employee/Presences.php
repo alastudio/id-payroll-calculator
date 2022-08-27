@@ -48,6 +48,9 @@ class Presences
      */
     public $latetime = 0;
 
+    public $overtimeValue = 0;
+    public $lateRuleSet = false;
+
     /**
      * Presences::$travelDays
      *

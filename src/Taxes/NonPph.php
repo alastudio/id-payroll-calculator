@@ -19,7 +19,7 @@ use O2System\Spl\DataStructures\SplArrayObject;
  * Class Pph21
  * @package Steevenz\IndonesiaPayrollCalculator\Taxes
  */
-class Pph21 extends AbstractPph
+class NonPph extends AbstractPph
 {
     /**
      * PPh21::calculate

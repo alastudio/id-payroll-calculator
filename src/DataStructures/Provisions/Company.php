@@ -117,4 +117,11 @@ class Company
      * @var int
      */
     public $latetimePenalty = 0;
+
+    /**
+     * Company::$latetimePenalty
+     *
+     * @var int
+     */
+    public $latePenalty = 0;
 }
