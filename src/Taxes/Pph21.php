@@ -55,9 +55,8 @@ class Pph21 extends AbstractPph
                 } else {
                     $this->result->pkp = $this->calculator->result->earnings->annualy->nett - $this->result->ptkp->amount;
                     $this->result->liability->annual = $this->result->pkp * ($this->getRate($this->calculator->result->earnings->nett) / 100);
-                    $this->result->liability->annual = $this->result->pkp;
                 }
-                
+
                 if($this->result->liability->annual > 0) {
                     // Jika tidak memiliki NPWP dikenakan tambahan 20%
                     if($this->calculator->employee->hasNPWP === false) {
@@ -65,9 +64,11 @@ class Pph21 extends AbstractPph
                     }
 
                     $this->result->liability->monthly = $this->result->liability->annual / 12;
+                    $this->result->liability->weekly = $this->result->liability->monthly / 4;
                 } else {
                     $this->result->liability->annual = 0;
                     $this->result->liability->monthly = 0;
+                    $this->result->liability->weekly = 0;
                 }
             }
         } else if ($this->calculator->result->employeeType == 'PKHL') {
@@ -76,7 +77,7 @@ class Pph21 extends AbstractPph
                 $totalEarnings = 0;
                 $totalWorkDays = $this->calculator->employee->presences->workDays;
                 $actualTax = 0;
-                
+
                 for ($i = 1; $i <= $totalWorkDays; $i++) {
                     $totalEarnings = $totalEarnings + $this->calculator->result->earnings->base;
 
@@ -104,13 +105,15 @@ class Pph21 extends AbstractPph
 
                 $this->result->liability->annual = 0;
                 $this->result->liability->monthly = $actualTax;
+                $this->result->liability->weekly = $actualTax/4;
 
                 // Jika tidak memiliki NPWP dikenakan tambahan 20%
                 if($this->calculator->employee->hasNPWP === false) {
                     $this->result->liability->monthly = $actualTax + ($actualTax * (20/100));
+                    $this->result->liability->weekly = $this->result->liability->monthly/4;
                 }
-                
-                
+
+
             } else {
                 $dailypkp       = $this->calculator->result->earnings->base - 450000;
                 $minEarnings    = 4500000; //Akumulasi pendapatan minimal dalam 1 bulan gaji
@@ -142,9 +145,11 @@ class Pph21 extends AbstractPph
                     }
 
                     $this->result->liability->monthly = $this->result->liability->annual / 12;
+                    $this->result->liability->weekly = $this->result->liability->monthly / 4;
                 } else {
                     $this->result->liability->annual = 0;
                     $this->result->liability->monthly = 0;
+                    $this->result->liability->weekly = 0;
                 }
 
             }
@@ -173,7 +178,7 @@ class Pph21 extends AbstractPph
                     $this->result->pkp = $this->calculator->result->earnings->annualy->nett - $this->result->ptkp->amount;
                     $this->result->liability->annual = ($this->result->pkp/2) * ($this->getRate($this->calculator->result->earnings->nett) / 100);
                 }
-                
+
                 if($this->result->liability->annual > 0) {
                     // Jika tidak memiliki NPWP dikenakan tambahan 20%
                     if($this->calculator->employee->hasNPWP === false) {
@@ -181,9 +186,11 @@ class Pph21 extends AbstractPph
                     }
 
                     $this->result->liability->monthly = $this->result->liability->annual / 12;
+                    $this->result->liability->weekly = $this->result->liability->monthly / 4;
                 } else {
                     $this->result->liability->annual = 0;
                     $this->result->liability->monthly = 0;
+                    $this->result->liability->weekly = 0;
                 }
             } else {
                 // Annual PTKP base on number of dependents family
@@ -209,7 +216,7 @@ class Pph21 extends AbstractPph
                     $this->result->pkp = $this->calculator->result->earnings->annualy->nett - $this->result->ptkp->amount;
                     $this->result->liability->annual = ($this->result->pkp/2) * ($this->getRate($this->calculator->result->earnings->nett) / 100);
                 }
-                
+
                 if($this->result->liability->annual > 0) {
                     // Jika tidak memiliki NPWP dikenakan tambahan 20%
                     if($this->calculator->employee->hasNPWP === false) {
@@ -217,14 +224,16 @@ class Pph21 extends AbstractPph
                     }
 
                     $this->result->liability->monthly = $this->result->liability->annual / 12;
+                    $this->result->liability->weekly = $this->result->liability->monthly / 4;
                 } else {
                     $this->result->liability->annual = 0;
                     $this->result->liability->monthly = 0;
+                    $this->result->liability->weekly = 0;
                 }
             }
         }
-        
-        
+
+
         return $this->result;
     }
 }

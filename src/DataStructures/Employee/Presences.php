@@ -20,6 +20,7 @@ namespace Steevenz\IndonesiaPayrollCalculator\DataStructures\Employee;
  */
 class Presences
 {
+
     /**
      * Presences::$workDays
      *
@@ -47,9 +48,13 @@ class Presences
      * @var int
      */
     public $latetime = 0;
+    public $latePenalty = 0;
 
     public $overtimeValue = 0;
+    public $absentPenalty = 0;
     public $lateRuleSet = false;
+
+    public $fixedOvertime = 0;
 
     /**
      * Presences::$travelDays
