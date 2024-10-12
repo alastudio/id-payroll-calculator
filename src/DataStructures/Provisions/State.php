@@ -33,7 +33,7 @@ class State
      *
      * @var int
      */
-    public $provinceMinimumWage = 3940972;
+    public $provinceMinimumWage = 5067381;
 
     /**
      * State::$highestWage
@@ -47,7 +47,7 @@ class State
      *
      * @var int
      */
-    public $highestWageJp = 9077600;
+    public $highestWageJp = 10042300;
 
     /**
      * State::$additionalPTKPforMarriedEmployees
@@ -65,6 +65,9 @@ class State
      */
     protected $listOfPTKP = [
         'TK/0' => 54000000,
+        'TK/1' => 58500000,
+        'TK/2' => 63000000,
+        'TK/3' => 67500000,
         'K/0'  => 58500000,
         'K/1'  => 63000000,
         'K/2'  => 67500000,
@@ -141,14 +144,26 @@ class State
      */
     public function getPtkp($numOfDependentsFamily, $married = false)
     {
-        if ($numOfDependentsFamily >= 3) {
-            return 'K/3';
-        } elseif ($numOfDependentsFamily == 2) {
-            return 'K/2';
-        } elseif ($numOfDependentsFamily == 1) {
-            return 'K/1';
-        } elseif ($married !== false) {
-            return 'K/0';
+        if ($married) {
+            if ($numOfDependentsFamily >= 3) {
+                return 'K/3';
+            } elseif ($numOfDependentsFamily == 2) {
+                return 'K/2';
+            } elseif ($numOfDependentsFamily == 1) {
+                return 'K/1';
+            } elseif ($numOfDependentsFamily == 0) {
+                return 'K/0';
+            }
+        } else {
+            if ($numOfDependentsFamily >= 3) {
+                return 'TK/3';
+            } elseif ($numOfDependentsFamily == 2) {
+                return 'TK/2';
+            } elseif ($numOfDependentsFamily == 1) {
+                return 'TK/1';
+            } elseif ($numOfDependentsFamily == 0) {
+                return 'TK/0';
+            }
         }
 
         return 'TK/0';
@@ -166,14 +181,26 @@ class State
      */
     public function getPtkpAmount($numOfDependentsFamily, $married = false)
     {
-        if ($numOfDependentsFamily >= 3) {
-            return $this->listOfPTKP[ 'K/3' ];
-        } elseif ($numOfDependentsFamily == 2) {
-            return $this->listOfPTKP[ 'K/2' ];
-        } elseif ($numOfDependentsFamily == 1) {
-            return $this->listOfPTKP[ 'K/1' ];
-        } elseif ($married !== false) {
-            return $this->listOfPTKP[ 'K/0' ];
+        if ($married) {
+            if ($numOfDependentsFamily >= 3) {
+                return $this->listOfPTKP[ 'K/3' ];
+            } elseif ($numOfDependentsFamily == 2) {
+                return $this->listOfPTKP[ 'K/2' ];
+            } elseif ($numOfDependentsFamily == 1) {
+                return $this->listOfPTKP[ 'K/1' ];
+            } elseif ($numOfDependentsFamily == 0) {
+                return $this->listOfPTKP[ 'K/0' ];
+            }
+        } else {
+            if ($numOfDependentsFamily >= 3) {
+                return $this->listOfPTKP[ 'TK/3' ];
+            } elseif ($numOfDependentsFamily == 2) {
+                return $this->listOfPTKP[ 'TK/2' ];
+            } elseif ($numOfDependentsFamily == 1) {
+                return $this->listOfPTKP[ 'TK/1' ];
+            } elseif ($numOfDependentsFamily == 0) {
+                return $this->listOfPTKP[ 'TK/0' ];
+            }
         }
 
         return $this->listOfPTKP[ 'TK/0' ];

@@ -35,6 +35,13 @@ class Company
     public $numOfWorkingHours = 8;
 
     /**
+     * Company::$workingDaysRule
+     *
+     * @var int
+     */
+    public $workingDaysRule = 5;
+
+    /**
      * Company::$calculateOvertime
      *
      * @var bool

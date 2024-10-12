@@ -70,11 +70,39 @@ class Employee
     public $allowances;
 
     /**
+     * Employee::$allowances_tax
+     *
+     * @var \Steevenz\IndonesiaPayrollCalculator\DataStructures\Employee\Allowances
+     */
+    public $allowances_tax;
+
+    /**
      * Employee::$deductions
      *
      * @var \Steevenz\IndonesiaPayrollCalculator\DataStructures\Employee\Deductions
      */
     public $deductions;
+
+    /**
+     * Employee::$deductions_tax
+     *
+     * @var \Steevenz\IndonesiaPayrollCalculator\DataStructures\Employee\Deductions
+     */
+    public $deductions_tax;
+
+    /**
+     * Employee::$benefits
+     *
+     * @
+     */
+    public $benefits;
+
+    /**
+     * Employee::$benefits_tax
+     *
+     * @
+     */
+    public $benefits_tax;
 
     /**
      * Company::$calculateHolidayAllowance
@@ -90,6 +118,8 @@ class Employee
      */
     public $bonus;
 
+    public $params;
+
     // ------------------------------------------------------------------------
 
     /**
@@ -97,10 +127,15 @@ class Employee
      */
     public function __construct()
     {
+        $this->params = new Employee\Params();
         $this->presences = new Employee\Presences();
         $this->earnings = new Employee\Earnings();
         $this->allowances = new Employee\Allowances();
+        $this->allowances_tax = new Employee\Allowances_tax();
         $this->deductions = new Employee\Deductions();
+        $this->deductions_tax = new Employee\Deductions_tax();
+        $this->benefits = new Employee\Benefits();
+        $this->benefits_tax = new Employee\Benefits_tax();
         $this->bonus = new Employee\Bonus();
     }
 }
