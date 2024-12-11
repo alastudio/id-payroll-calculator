@@ -56,6 +56,15 @@ class PayrollCalculator
     public $gross_percentage = [50, 50];
 
     /**
+     * PayrollCalculator::taxAccumulation
+     *
+     * Tax accumulation from jan-nov
+     *
+     * @var array
+     */
+    public $taxAccumulation = 0;
+
+    /**
      * PayrollCalculator::GROSS_UP_CALCULATION
      *
      * Tanggungan PPh 21 ditambahkan sebagai tunjangan pekerja/karyawan.
@@ -308,6 +317,8 @@ class PayrollCalculator
                     'gross' => 0,
                 ]),
             ]),
+            'taxAccumulation' => 0,
+            'currentMonth' => 0,
             'takeHomePay' => 0,
             'employeeType' => '',
             'berkesinambungan' => '',
@@ -545,6 +556,8 @@ class PayrollCalculator
         $this->result->earnings->fixedAllowance = $this->employee->earnings->fixedAllowance;
         $this->result->earnings->fixedAllowance_taxed = $this->employee->earnings->fixedAllowance_taxed;;
         $this->result->method = $this->method;
+        $this->result->currentMonth = $this->currentMonth;
+        $this->result->taxAccumulation = $this->taxAccumulation;
 
         // Penghasilan bruto bulanan merupakan gaji pokok ditambah tunjangan tetap
         $this->result->earnings->gross = $this->result->earnings->base + $this->employee->earnings->fixedAllowance_taxed;

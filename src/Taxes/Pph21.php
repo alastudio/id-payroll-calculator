@@ -70,7 +70,7 @@ class Pph21 extends AbstractPph
                             $this->result->liability->annual = $this->result->liability->annual + ($this->result->liability->annual * (20/100));
                         }
 
-                        $this->result->liability->monthly = floor($this->result->liability->annual / 12);
+                        $this->result->liability->monthly = $this->result->liability->annual - $this->calculator->result->taxAccumulation; //floor($this->result->liability->annual / 12);
                         $this->result->liability->weekly = floor($this->result->liability->monthly / 4);
                     } else {
                         $this->result->liability->annual = 0;
