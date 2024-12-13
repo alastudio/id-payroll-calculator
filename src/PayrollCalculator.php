@@ -554,14 +554,15 @@ class PayrollCalculator
         // Gaji + Penghasilan teratur
         $this->result->earnings->base = $this->employee->earnings->base;
         $this->result->earnings->fixedAllowance = $this->employee->earnings->fixedAllowance;
-        $this->result->earnings->fixedAllowance_taxed = $this->employee->earnings->fixedAllowance_taxed;;
+        $this->result->earnings->fixedAllowance_taxed = $this->employee->earnings->fixedAllowance_taxed;
+        $this->result->earnings->Allowance_taxed = $this->employee->allowances_tax->getSum();
         $this->result->method = $this->method;
         $this->result->currentMonth = $this->currentMonth;
         $this->result->taxAccumulation = $this->taxAccumulation;
 
         // Penghasilan bruto bulanan merupakan gaji pokok ditambah tunjangan tetap
-        $this->result->earnings->gross = $this->result->earnings->base + $this->employee->earnings->fixedAllowance_taxed;
-        $this->result->earnings->salary_gross = $this->result->earnings->base + $this->employee->earnings->fixedAllowance;
+        $this->result->earnings->gross = $this->result->earnings->base + $this->employee->earnings->fixedAllowance_taxed + $this->employee->allowances_tax->getSum(); 
+        $this->result->earnings->salary_gross = $this->result->earnings->base + $this->employee->earnings->fixedAllowance + $this->employee->allowances->getSum();
         $this->result->earnings->gross_first = $this->result->earnings->base + $this->employee->earnings->fixedAllowance;
 
         if ($this->employee->calculateHolidayAllowance > 0) {
