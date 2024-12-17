@@ -270,11 +270,15 @@ class Pph21 extends AbstractPph
                     //Find matching ter rate for current ptkp
                     // current ter rate ['id' => '1', 'category' => 'A', 'monthly_min_gross' => '0', 'monthly_max_gross' => '5400000', 'rate' => '0.00']
                     if (in_array($ptkp, $this->calculator->ter_ptkp_a)) {
-                        $current_rate = $this->getCurrentTerRate($this->calculator->ter_A, $this->calculator->result->earnings->gross);
+                        $ter_rate = 'ter_A';
                     } else if (in_array($ptkp, $this->calculator->ter_ptkp_b)) {
-                        $current_rate = $this->getCurrentTerRate($this->calculator->ter_B, $this->calculator->result->earnings->gross);
+                        $ter_rate = 'ter_B';
                     } else if (in_array($ptkp, $this->calculator->ter_ptkp_c)) {
-                        $current_rate = $this->getCurrentTerRate($this->calculator->ter_C, $this->calculator->result->earnings->gross);
+                        $ter_rate = 'ter_C';
+                    }
+
+                    if (isset($ter_rate)) {
+                        $current_rate = $this->getCurrentTerRate($this->calculator->{$ter_rate}, $this->calculator->result->earnings->gross);
                     }
 
                     $this->result->ptkp->ter_category = $current_rate['category'];
@@ -282,20 +286,28 @@ class Pph21 extends AbstractPph
                     $this->result->ptkp->tax_ratio = $current_rate['tax_ratio'];
                     if ($this->calculator->method === 'GROSSUP') {
                         $first_tax = $current_rate['tax_ratio'] * $this->calculator->result->earnings->gross;
-                        $this->result->liability->allowance = floor($first_tax);
-                        $gross_include_first_tax = $this->calculator->result->earnings->gross + floor($first_tax);
-                        $this->result->liability->gross = $this->calculator->result->earnings->gross;
+                        $pph_non_gross_up = $current_rate['rate'] * $this->calculator->result->earnings->gross;
+                        $bruto_gross_up = $this->calculator->result->earnings->gross + $pph_non_gross_up;
 
-                        if (in_array($ptkp, $this->calculator->ter_ptkp_a)) {
-                            $grossup_rate = $this->getCurrentTerRate($this->calculator->ter_A, $gross_include_first_tax);
-                        } else if (in_array($ptkp, $this->calculator->ter_ptkp_b)) {
-                            $grossup_rate = $this->getCurrentTerRate($this->calculator->ter_B, $gross_include_first_tax);
-                        } else if (in_array($ptkp, $this->calculator->ter_ptkp_c)) {
-                            $grossup_rate = $this->getCurrentTerRate($this->calculator->ter_C, $gross_include_first_tax);
+                        if (isset($ter_rate)) {
+                            $grossup_rate = $this->getCurrentTerRate($this->calculator->{$ter_rate}, $bruto_gross_up);
                         }
 
-                        $this->result->liability->monthly = floor($grossup_rate['tax_ratio'] * $this->calculator->result->earnings->gross);
-                        $this->result->liability->grossup_rate = $grossup_rate;
+                        $penyesuaian_pph_gross_up = $this->calculator->result->earnings->gross * $grossup_rate['tax_ratio'];
+                        $bruto_penyesuaian_gross_up = $this->calculator->result->earnings->gross + $penyesuaian_pph_gross_up;
+
+                        if (isset($ter_rate)) {
+                            $penyesuaian_grossup_rate = $this->getCurrentTerRate($this->calculator->{$ter_rate}, $bruto_penyesuaian_gross_up);
+                        }
+
+                        $tunjangan_pph = $this->calculator->result->earnings->gross * $penyesuaian_grossup_rate['tax_ratio'];
+                        $bruto_tunj_pph = $this->calculator->result->earnings->gross + $tunjangan_pph;
+
+                        $this->result->liability->allowance = floor($tunjangan_pph); 
+                        $this->result->liability->gross = $this->calculator->result->earnings->gross;
+
+                        $this->result->liability->monthly = floor($penyesuaian_grossup_rate['rate'] * $bruto_tunj_pph);
+                        $this->result->liability->grossup_rate = $penyesuaian_grossup_rate;
                     } else if ($this->calculator->method === 'GROSS') {
                         $this->result->liability->monthly = floor((floatval($current_rate['rate']) / 100) * $this->calculator->result->earnings->gross);
                     } else {
