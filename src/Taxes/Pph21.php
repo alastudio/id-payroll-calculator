@@ -307,7 +307,10 @@ class Pph21 extends AbstractPph
                         $this->result->liability->gross = $this->calculator->result->earnings->gross;
 
                         $this->result->liability->monthly = floor($penyesuaian_grossup_rate['rate'] * $bruto_tunj_pph);
-                        $this->result->liability->grossup_rate = $penyesuaian_grossup_rate;
+                        $this->result->liability->non_grossup_rate = $current_rate;
+                        $this->result->liability->grossup_rate = $grossup_rate;
+                        $this->result->liability->penyesuaian_grossup_rate = $penyesuaian_grossup_rate; 
+
                     } else if ($this->calculator->method === 'GROSS') {
                         $this->result->liability->monthly = floor((floatval($current_rate['rate']) / 100) * $this->calculator->result->earnings->gross);
                     } else {
