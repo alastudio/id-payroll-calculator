@@ -286,7 +286,7 @@ class Pph21 extends AbstractPph
                     $this->result->ptkp->tax_ratio = $current_rate['tax_ratio'];
                     if ($this->calculator->method === 'GROSSUP') {
                         $first_tax = $current_rate['tax_ratio'] * $this->calculator->result->earnings->gross;
-                        $pph_non_gross_up = $current_rate['rate'] * $this->calculator->result->earnings->gross;
+                        $pph_non_gross_up = (floatval($current_rate['rate']) / 100) * $this->calculator->result->earnings->gross;
                         $bruto_gross_up = $this->calculator->result->earnings->gross + $pph_non_gross_up;
 
                         if (isset($ter_rate)) {
@@ -305,11 +305,11 @@ class Pph21 extends AbstractPph
 
                         $this->result->liability->allowance = floor($tunjangan_pph); 
                         $this->result->liability->gross = $this->calculator->result->earnings->gross;
-                        $this->result->liability->pph_non_bruto_gross_up = $pph_non_gross_up;
+                        $this->result->liability->pph_non_gross_up = $pph_non_gross_up;
                         $this->result->liability->bruto_gross_up = $bruto_gross_up;
                         $this->result->liability->penyesuaian_pph_gross_up = $penyesuaian_pph_gross_up;
                         $this->result->liability->bruto_penyesuaian_gross_up = $bruto_penyesuaian_gross_up;
-                        $this->result->liability->monthly = floor($penyesuaian_grossup_rate['rate'] * $bruto_tunj_pph);
+                        $this->result->liability->monthly = floor(floatval($penyesuaian_grossup_rate['rate']) * $bruto_tunj_pph);
                         $this->result->liability->non_grossup_rate = $current_rate;
                         $this->result->liability->grossup_rate = $grossup_rate;
                         $this->result->liability->penyesuaian_grossup_rate = $penyesuaian_grossup_rate; 
